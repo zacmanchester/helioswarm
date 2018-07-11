@@ -1,0 +1,7 @@
+                                                                                                                                                   19 Jun 2018 12:24:10
+Satellite-Hub:  J2000 Classical Orbit Elements
+
+
+       Time (UTCG)          Semi-major Axis (km)    Eccentricity    Inclination (deg)    RAAN (deg)    Arg of Perigee (deg)    True Anomaly (deg)    Mean Anomaly (deg)
+------------------------    --------------------    ------------    -----------------    ----------    --------------------    ------------------    ------------------
+25 Jan 2024 22:30:25.520           243729.554542        0.598335               51.975        61.110                 247.345                 0.000                 0.000
