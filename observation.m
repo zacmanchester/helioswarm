@@ -1,9 +1,9 @@
-function [y,C] = observation(x,xhub)
+function [y,C] = observation(xnode,xhub)
 
-y = norm(x(1:3)-xhub(1:3));
+y = norm(xnode(1:3)-xhub(1:3));
 
 if nargout == 2
-    C = [(x(1:3)-xhub(1:3))'/y, zeros(1,3)];
+    C = [(xnode(1:3)-xhub(1:3))'/y, zeros(1,3)];
 end
 
 end

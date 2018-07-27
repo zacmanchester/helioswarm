@@ -54,9 +54,9 @@ for k = 1:Nsat
 xswarm = [xswarm; xsat'];
 end
 
-G = obsgram(t,xswarm,@(t,x)dynamics_mex(t,x,t_ephem,x_ephem),@(x)observation(x));
-sig = svd(G);
-min(sig)
+% G = obsgram(t,xswarm,@(t,x)dynamics_mex(t,x,t_ephem,x_ephem),@(x)observation(x));
+% sig = svd(G);
+% min(sig)
 
 r_samp = ephemInterp(t_samp,t_ephem,x_ephem);
 
