@@ -48,6 +48,7 @@ V = blkdiag(1e-4*eye(3), 1e-2*eye(3));
 W = 1e-5;
 
 [xhist1,Uhist1] = isrekf(x0hub + 1e-3*(x0node-x0hub),U0,V,W,t,yhist,xhub,t_ephem,x_ephem);
+[xhist2,Phist2] = iks(x0hub + 1e-3*(x0node-x0hub),U0,V,W,t,yhist,xhub,t_ephem,x_ephem);
 
 lsoptions = optimoptions('lsqnonlin','Algorithm','levenberg-marquardt','Display','iter');
 [x0est,res] = lsqnonlin(@(x)lserror(x,xhub,yhist,t_samp,t_ephem,x_ephem),x0hub + 1e-3*(x0node-x0hub),[],[],lsoptions);
@@ -83,40 +84,43 @@ plot(t,2000*sqrt(squeeze(Phist1(3,3,:))),'r');
 plot(t,-2000*sqrt(squeeze(Phist1(3,3,:))),'r');
 xlabel('Time (days)');
 
-% figure(2);
-% subplot(3,1,1);
-% plot(t,1000*(xhist2(1,:)-xnode(1,:)));
-% hold on
-% plot(t,2000*sqrt(squeeze(Phist2(1,1,:))),'r');
-% plot(t,-2000*sqrt(squeeze(Phist2(1,1,:))),'r');
-% subplot(3,1,2);
-% plot(t,1000*(xhist2(2,:)-xnode(2,:)));
-% hold on
-% plot(t,2000*sqrt(squeeze(Phist2(2,2,:))),'r');
-% plot(t,-2000*sqrt(squeeze(Phist2(2,2,:))),'r');
-% ylabel('Position Error (km)');
-% subplot(3,1,3);
-% plot(t,1000*(xhist2(3,:)-xnode(3,:)));
-% hold on
-% plot(t,2000*sqrt(squeeze(Phist2(3,3,:))),'r');
-% plot(t,-2000*sqrt(squeeze(Phist2(3,3,:))),'r');
-% xlabel('Time (days)');
+figure(2);
+subplot(3,1,1);
+plot(t,1000*(xhist2(1,:)-xnode(1,:)));
+hold on
+plot(t,2000*sqrt(squeeze(Phist2(1,1,:))),'r');
+plot(t,-2000*sqrt(squeeze(Phist2(1,1,:))),'r');
+subplot(3,1,2);
+plot(t,1000*(xhist2(2,:)-xnode(2,:)));
+hold on
+plot(t,2000*sqrt(squeeze(Phist2(2,2,:))),'r');
+plot(t,-2000*sqrt(squeeze(Phist2(2,2,:))),'r');
+ylabel('Position Error (km)');
+subplot(3,1,3);
+plot(t,1000*(xhist2(3,:)-xnode(3,:)));
+hold on
+plot(t,2000*sqrt(squeeze(Phist2(3,3,:))),'r');
+plot(t,-2000*sqrt(squeeze(Phist2(3,3,:))),'r');
+xlabel('Time (days)');
 
 figure(3);
 subplot(3,1,1);
 plot(t,1000*(xhist3(1,:)-xnode(1,:)));
 hold on
 plot(t,1000*(xhist1(1,:)-xnode(1,:)));
-legend('batch','EKF');
+plot(t,1000*(xhist2(1,:)-xnode(1,:)));
+legend('batch','EKF','Smoother');
 subplot(3,1,2);
 plot(t,1000*(xhist3(2,:)-xnode(2,:)));
 hold on
 plot(t,1000*(xhist1(2,:)-xnode(2,:)));
+plot(t,1000*(xhist2(2,:)-xnode(2,:)));
 ylabel('Position Error (km)');
 subplot(3,1,3);
 plot(t,1000*(xhist3(3,:)-xnode(3,:)));
 hold on
 plot(t,1000*(xhist1(3,:)-xnode(3,:)));
+plot(t,1000*(xhist2(3,:)-xnode(3,:)));
 xlabel('Time (days)');
 
 % figure(4);

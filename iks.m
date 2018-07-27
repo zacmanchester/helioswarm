@@ -1,15 +1,25 @@
-function [xhist,Phist] = iekf(x0,P0,Q,R,thist,yhist,xhub,t_ephem,x_ephem)
+function [xhat,Phat] = iks(x0,P0,Q,R,thist,yhist,xhub,t_ephem,x_ephem)
 
 %Setup
 Nx = length(x0);
 xhist = zeros(Nx,length(thist));
+xbar = xhist;
+xbar(:,1) = x0;
+xhat = xbar;
 Phist = zeros(Nx,Nx,length(thist));
+Pbar = Phist;
+Pbar(:,:,1) = P0;
+Phat = Pbar;
+A = zeros(Nx,Nx,length(thist));
 dt = thist(2)-thist(1); %assume uniform sampling
+
+
+%--------------- Forward Pass ---------------%
 
 %First step
 xnew = x0;
 dx = 1;
-while any(abs(dx) > 1e-6)
+% while any(abs(dx) > 1e-6)
     [yp, C] = observation(xnew,xhub(:,1));
     
     %Innovation
@@ -22,46 +32,48 @@ while any(abs(dx) > 1e-6)
     %Update
     dx = K*z;
     xnew = xnew + dx;
-end
+% end
 xhist(:,1) = xnew;
 Phist(:,:,1) = (eye(Nx)-K*C)*P0*(eye(Nx)-K*C)' + K*R*K';
 
 for k = 1:(length(thist)-1)
     
     %Predict
-    [xp, A] = ode3(thist(k),xhist(:,k));
-    Pp = A*Phist(:,:,k)*A' + Q;
+    [xbar(:,k+1), A(:,:,k)] = ode3(thist(k),xhist(:,k));
+    Pbar(:,:,k+1) = A(:,:,k)*Phist(:,:,k)*A(:,:,k)' + Q;
     
-    xnew = xp;
+    
+    xnew = xbar(:,k+1);
     dx = 1;
-    while any(abs(dx) > 1e-6)
+%     while any(abs(dx) > 1e-6)
         [yp, C] = observation(xnew,xhub(:,k+1));
         
         %Innovation
         z = yhist(:,k+1) - yp;
-        S = C*Pp*C' + R;
+        S = C*Pbar(:,:,k+1)*C' + R;
         
         %Kalman Gain
-        K = (Pp*C')/S;
+        K = (Pbar(:,:,k+1)*C')/S;
         
         %Update
         dx = K*z;
         xnew = xnew + dx;
-    end
-    
-    %Covariance update
+%     end
     xhist(:,k+1) = xnew;
-    Phist(:,:,k+1) = (eye(Nx)-K*C)*Pp*(eye(Nx)-K*C)' + K*R*K';
+    Phist(:,:,k+1) = (eye(Nx)-K*C)*Pbar(:,:,k+1)*(eye(Nx)-K*C)' + K*R*K';
     
 end
 
-    function [xn, A] = ode2(t,x)
-        [xdot1,A1] = dynamics(t,x,t_ephem,x_ephem);
-        xmid = x + (dt/2)*xdot1;
-        [xdot2,A2] = dynamics(t+dt/2,xmid,t_ephem,x_ephem);
-        xn = x + dt*xdot2;
-        A = eye(Nx) + dt*A2 + 0.5*dt*dt*A2*A1;
-    end
+%--------------- Backward Pass ---------------%
+
+xhat(:,end) = xhist(:,end);
+Phat(:,:,end) = Phist(:,:,end);
+for k = (length(thist)-1):-1:1
+    L = Phist(:,:,k)*A(:,:,k)'/Pbar(:,:,k+1);
+    xhat(:,k) = xhist(:,k) + L*(xhat(:,k+1) - xbar(:,k+1));
+    Phat(:,:,k) = Phist(:,:,k) + L*(Phat(:,:,k+1) - Pbar(:,:,k+1))*L';
+end
+
 
     function [xn, A] = ode3(t,x)
         [xdot1,A1] = dynamics(t,x,t_ephem,x_ephem);
