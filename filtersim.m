@@ -1,4 +1,5 @@
 clear all
+close all
 
 %Load sun + moon ephem data
 [t_sun,x_sun] = readEphemData('horizons_sun.txt');
@@ -24,7 +25,7 @@ p = a*(1-e*e); %semilatus rectum
 x0hub = [r0/1000; v0*(24*60*60/1000)];
 t0 = 25 + 22/24 + 30/(24*60) + 25.52/(24*60*60);
 
-dt = 1/24; %once every 60 min
+dt = .5/24; %once every 60 min
 t_samp = t0:dt:(t0+16);
 
 x0node = diag(ones(6,1)+[1e-4*randn(3,1); 1e-5*randn(3,1)])*x0hub;
@@ -44,11 +45,11 @@ for k = 1:length(t)
 end
 
 U0 = .1*eye(6);
-V = blkdiag(1e-4*eye(3), 1e-2*eye(3));
+V = blkdiag(1e-6*eye(3), 1e-3*eye(3));
 W = 1e-5;
 
-[xhist1,Uhist1] = isrekf(x0hub + 1e-3*(x0node-x0hub),U0,V,W,t,yhist,xhub,t_ephem,x_ephem);
-[xhist2,Phist2] = iks(x0hub + 1e-3*(x0node-x0hub),U0,V,W,t,yhist,xhub,t_ephem,x_ephem);
+[xhist1,Uhist1] = isrekf(x0node + 1e-6*randn(6,1),U0,V,W,t,yhist,xhub,t_ephem,x_ephem);
+[xhist2,Phist2] = iks(x0node + 1e-6*randn(6,1),U0'*U0,V'*V,W'*W,dt,t,yhist,xhub,t_ephem,x_ephem);
 
 lsoptions = optimoptions('lsqnonlin','Algorithm','levenberg-marquardt','Display','iter');
 [x0est,res] = lsqnonlin(@(x)lserror(x,xhub,yhist,t_samp,t_ephem,x_ephem),x0hub + 1e-3*(x0node-x0hub),[],[],lsoptions);
@@ -67,6 +68,7 @@ end
 
 figure(1);
 subplot(3,1,1);
+title('EKF');
 plot(t,1000*(xhist1(1,:)-xnode(1,:)));
 hold on
 plot(t,2000*sqrt(squeeze(Phist1(1,1,:))),'r');
@@ -86,6 +88,7 @@ xlabel('Time (days)');
 
 figure(2);
 subplot(3,1,1);
+title('Smoother');
 plot(t,1000*(xhist2(1,:)-xnode(1,:)));
 hold on
 plot(t,2000*sqrt(squeeze(Phist2(1,1,:))),'r');
