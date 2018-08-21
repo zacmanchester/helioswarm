@@ -4,7 +4,7 @@
 
 ### To run the demo:
 
-1. Install Julia v0.7.0 from here: https://julialang.org/downloads/ (not 1.0)
+1. Install Julia v0.7.0 (not 1.0 - keep scrolling) from here: https://julialang.org/downloads/
 2. Add the following packages to your Julia installation: IJulia, Plots, CSV, Interpolations, DifferentialEquations, Optim. To do this, type "]" at the prompt to start the package manager, then type "add __Name_of_Package__".
 3. Exit the package manager by hitting backspace.
 4. launch IJulia by typing "using IJulia" then "notebook()" to launch the notebook in your browser.
