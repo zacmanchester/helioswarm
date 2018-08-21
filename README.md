@@ -8,4 +8,4 @@
 2. Add the following packages to your Julia installation: IJulia, Plots, CSV, Interpolations, DifferentialEquations, Optim. To do this, type "]" at the prompt to start the package manager, then type "add NameOfPackage".
 3. Exit the package manager by hitting backspace.
 4. launch IJulia by typing "using IJulia" then "notebook()" to launch the notebook in your browser.
-5. Navigate and open the EstimatorTest.ipynb file, then run it.
+5. Navigate and open the EstimatorTest.ipynb file, then run it on block at a time by clicking on a code block and typing Shift+Enter (starting from the top).
